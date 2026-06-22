@@ -1,11 +1,16 @@
-import express from "express";
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const authRoute = require("./routes/auth.route");
 
 const app = express();
 
-app.get("/", (req, res) => {
-  res.send("Hello World");
-});
+app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
+app.use(express.json());
 
-app.listen(3000, () => {
-  console.log("Server is running on http://localhost:3000");
-});
+app.use("/api/auth", authRoute);
+
+app.get("/health", (req, res) => res.json({ status: "ok" }));
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
