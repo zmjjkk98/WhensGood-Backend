@@ -1,0 +1,38 @@
+### 액세스 토큰
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiZW1haWwiOiJxc2UwMTI4QG5hdmVyLmNvbSIsImlhdCI6MTc4MjQ3MDU3OSwiZXhwIjoxNzgyNDcxNDc5fQ.mrN861mi_72U9Ez4DIkx1D3DJqLrrH2grecwgFaok_s
+
+### 이벤트 생성
+POST http://localhost:3000/api/events HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+  "title": "팀 회식 날짜 정하기4",
+  "description": "이번 달 회식 날짜 투표해요4",
+  "timeSlots": [
+    { "startTime": "2026-07-05 18:00:00", "endTime": "2026-07-05 21:00:00" },
+    { "startTime": "2026-07-08 18:00:00", "endTime": "2026-07-08 21:00:00" }
+  ]
+}
+
+### 이벤트 조회
+GET http://localhost:3000/api/events/5 HTTP/1.1
+
+### 이벤트 투표
+POST http://localhost:3000/api/events/7/vote HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{
+   "votes": [
+    { "slotId": 7, "available": true },
+    { "slotId": 8, "available": false }
+  ]
+}
+
+### 이벤트 확정
+PATCH http://localhost:3000/api/events/7/confirm HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{accessToken}}
+
+{ "slotId": 8 }

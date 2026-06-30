@@ -1,4 +1,5 @@
 const pool = require("../config/db");
+const mailService = require("./mail.service");
 
 const createEvent = async ({ hostId, title, description, timeSlots = [] }) => {
   const conn = await pool.getConnection();
@@ -131,6 +132,26 @@ const confirmEvent = async ({ eventId, hostId, slotId }) => {
     'UPDATE events SET status = "confirmed", confirmed_at = NOW() WHERE id = ?',
     [eventId],
   );
+
+  // 참여자 이메일 목록 조회
+  const [participants] = await pool.query(
+    `SELECT u.email FROM participants p
+     JOIN users u ON p.user_id = u.id
+     WHERE p.event_id = ?`,
+    [eventId],
+  );
+
+  // 전체 참여자에게 이메일 발송
+  const emailPromises = participants.map(({ email }) =>
+    mailService.sendConfirmation({
+      to: email,
+      title: events[0].title,
+      startTime: slot[0].start_time,
+      endTime: slot[0].end_time,
+    }),
+  );
+
+  await Promise.all(emailPromises);
 
   return { message: "이벤트가 확정됐습니다.", confirmedSlot: slot[0] };
 };
